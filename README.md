@@ -56,10 +56,10 @@
     -main.cpp   //DES加解密功能测试，DES模块函数入口
     -Makefile   //使用make编译Des程序，执行main
 -Tcp_Source     //TCP聊天功能相关
-  	-Config.h		//通用的函数
-  	-TCP_Server.cpp//服务端实现
-  	-TCP_Client.cpp//客户端实现
-  	-compile.sh   //编译脚本，生成client和server可执行程序
+    -Config.h		//通用的函数
+    -TCP_Server.cpp//服务端实现
+    -TCP_Client.cpp//客户端实现
+    -compile.sh   //编译脚本，生成client和server可执行程序
 ```
 
 七、参考文章
