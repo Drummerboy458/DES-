@@ -6,12 +6,12 @@ CC = g++
 LD = g++
 CFLAGS   += -O2 -Wall -Werror
 
-OBJS = Des.o main.o
+OBJS = des.o main.o
 
 main.o : 
 	@$(CC) -c main.cpp
-Des.o : 
-	@$(CC) -c Des.cpp
+des.o : 
+	@$(CC) -c des.cpp
 app:$(OBJS)
 	@echo + LD $@
 	@$(LD) $(OBJS) -o $(NAME) 

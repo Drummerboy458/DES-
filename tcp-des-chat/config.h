@@ -1,5 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
+#include "des-src/des.h"
 #include <iostream>
 #include <string>
 #include "sys/socket.h"//提供socket函数及数据结构
@@ -9,10 +10,12 @@ using namespace std;
 //TCP客户端与服务端之间提前约定好的密钥及最大的传输长度防止接收方缓冲区溢出
 const string key = "123456";
 const int bufferSize = 1024;
-
+static Des des;
 bool send_data(int sockfd,string data) //发送数据
 {
-    const char* cmd = data.c_str();
+    string encode_data = des.encode(data);
+    //cout<<"encode_data："<<encode_data<<endl;
+    const char* cmd = encode_data.c_str();
     size_t size  = strlen(cmd)*sizeof(char);
     size_t total = 0;
     while(total < size)

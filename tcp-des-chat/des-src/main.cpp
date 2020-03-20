@@ -1,7 +1,7 @@
 /*
  * 测试DES加密解密功能
  */
-#include "Des.h"
+#include "des.h"
 int main()
 {
     Des des;

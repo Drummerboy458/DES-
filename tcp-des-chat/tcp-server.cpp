@@ -4,7 +4,7 @@
 //  Created by Lww on 20290/3/20.
 //  Copyright © 2019 Lww. All rights reserved.
 //
-#include "Config.h"
+#include "config.h"
 static int sockfd; //全局文件描述符，绑定用于监听的socket
 //网络字节顺序NBO: 按从高到低的顺序存储，在网络上使用统一的网络字节顺序，避免兼容性问题。
 //主机字节顺序HBO: 不同的机器HBO不相同
@@ -30,12 +30,14 @@ void do_service(int fd)
             perror("read error");
         }
         string s = buffer;
-        if(s == "-exit")    //客户端发起exit命令,结束本次通信
+        string decode_data = des.decode(s);
+        //cout<<decode_data.size()<<endl;注意返回来的解密数据长度是8的倍数
+        if(decode_data[0] == '-' && decode_data[1] == 'e')    //客户端发起exit命令,结束本次通信
                 break;
-        if(s == "-chat")
+        if(decode_data[0] == '-' && decode_data[1] == 'c')
             cout<<"接电话！主人快接电话！"<<endl<<">>";
         else
-            cout<<"Client："<<s<<endl<<">>";
+            cout<<"client："<<decode_data<<endl<<">>";
         
         //服务端回应
         char reply[bufferSize];
@@ -49,7 +51,9 @@ void do_service(int fd)
         }
    }
 }
-int main(int argc, const char * argv[]) {
+int main(int argc, const char * argv[]) 
+{
+    des.setKey(key);
     if(argc < 2)
     {
         cout<<"usage:"<<argv[0]<<" "<<"#port"<<endl;

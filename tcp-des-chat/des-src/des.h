@@ -6,7 +6,7 @@
 
 #include <bitset>
 #include <iostream>
-#include "Const.h"
+#include "const.h"
 #include <math.h>
 using namespace std;
 class Des

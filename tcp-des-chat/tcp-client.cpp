@@ -5,7 +5,7 @@
 //  Copyright © 2019 Lww. All rights reserved.
 //
 
-#include "Config.h"
+#include "config.h"
 static int sockfd;
 void begin_to_chat() //从服务端接收数据
 {
@@ -29,7 +29,8 @@ void begin_to_chat() //从服务端接收数据
             perror("read error");
         }
         string s = buffer;
-        cout<<"Server："<<s<<endl;
+        string decode_data = des.decode(s);
+        cout<<"server："<<decode_data<<endl;
         //客户端回应
         string reply;
         cout<<">>";
@@ -50,6 +51,7 @@ void begin_to_chat() //从服务端接收数据
 }
 int main(int argc,const char* argv[])
 {
+    des.setKey(key);
     if(argc<3)
     {
         cout<<"usage:"<<argv[0]<<"  #ip #port"<<endl;
