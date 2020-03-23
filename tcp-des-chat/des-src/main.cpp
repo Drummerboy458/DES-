@@ -5,7 +5,7 @@
 int main()
 {
     Des des;
-    string s= "Hello World!";
+    string s= "romantic";
     string k = "12345678";
     cout<<"密钥："<<k<<endl;
     cout<<"内容："<<s<<endl;
