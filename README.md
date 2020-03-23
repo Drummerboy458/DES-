@@ -50,16 +50,16 @@
 
 ```c++
 |-tcp-des-chat
-		|-des-src					//DES算法实现
-  			|-Const.h    //一些DES用到的常量，如置换表
-    		|-Des.h      //封装的DES类，供外部调用加密和解密操作
-    		|-Des.cpp    //DES类成员的实现
-    		|-main.cpp   //DES加解密功能测试
-    		|-Makefile   //使用make编译Des模块，执行main
- 		|-config.h//客户端和服务端共用的函数和常量
-  	|-tcp-client.cpp//客户端实现
-  	|-tcp-server.cpp//服务端实现
-  	|-Makefile	//make编译链接生成client和server可执行程序
+    |-des-src					//DES算法实现
+  	|-Const.h    //一些DES用到的常量，如置换表
+    	|-Des.h      //封装的DES类，供外部调用加密和解密操作
+    	|-Des.cpp    //DES类成员的实现
+    	|-main.cpp   //DES加解密功能测试
+    	|-Makefile   //使用make编译Des模块，执行main
+ 	|-config.h//客户端和服务端共用的函数和常量
+    |-tcp-client.cpp//客户端实现
+    |-tcp-server.cpp//服务端实现
+    |-Makefile	//make编译链接生成client和server可执行程序
 
 ```
 
