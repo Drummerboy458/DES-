@@ -1,65 +1,12 @@
 #include "rsa.h"
-#include <time.h> 
+#include "tools.h"
 #include "math.h"
+
+#include <time.h> 
 #include <iostream>
 #include "stdlib.h"
 
 using namespace std;
-unsigned int Rsa:: PowMod(unsigned int base, unsigned int pow, unsigned int n)
-{
-    unsigned int a=base, b=pow, c=1; 
-    while(b)
-    {
-        while(!(b & 1)) 
-        {
-            b>>=1;
-            a=MulMod(a, a, n); 
-        }
-        b--;
-        c=MulMod(a, c, n);
-    }
-    return c;
-}
-
-unsigned int Rsa:: MulMod(unsigned int a, unsigned int b, unsigned int n)
-{
-    return (a% n) * (b% n) % n;
-}
-long Rsa::RabinMillerKnl(unsigned int &n)
-{
-    unsigned int a, q, k, v;
-    q = n - 1;
-    k=0;
-    while(!(q & 1)) 
-    {
-        ++k;
-        q>>=1; 
-    }
-    a=2 + rand() % (n - 3); 
-    v=PowMod(a, q, n);
-    if(v == 1)
-        return 1;
-
-    for(int j=0;j<k;j++) 
-    {
-        unsigned int z=1; 
-        for(int w=0;w<j;w++) 
-            z*=2; 
-        if(PowMod(a, z*q, n)==n-1) 
-            return 1;
-    }
-    return 0;
-}
-
-long Rsa::RabinMiller(unsigned int &n,long loop)
-{
-    for(long i=0; i < loop; i++) 
-    {
-        if(!RabinMillerKnl(n)) 
-            return 0; 
-    }
-    return 1;
-}
 
 unsigned int Rsa::RandomPrime(int bits)
 {
@@ -130,8 +77,8 @@ void Rsa::check_key()
 void Rsa::RsaGetParam()
 {
     srand((unsigned)time(0)); 
-    t_val.p = RandomPrime(3);
-    t_val.q = RandomPrime(3);
+    t_val.p = RandomPrime(8);
+    t_val.q = RandomPrime(8);
     p_key.n = s_key.n = t_val.p * t_val.q;
 
     t_val.ola_val = ola(p_key.n);
@@ -164,4 +111,12 @@ Public_key Rsa:: get_public_key()
 Secret_key Rsa:: get_secret_key()
 {
     return this->s_key;
+}
+unsigned int Rsa::Encry(unsigned int des_key, Public_key cKey)
+{
+    return PowMod(des_key, cKey.e, cKey.n);
+}
+unsigned int Rsa::Decry(unsigned int encrpt_des_key, Secret_key cKey )
+{
+    return PowMod(encrpt_des_key, cKey.d, cKey.n);
 }

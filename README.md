@@ -1,6 +1,11 @@
 # DES加密算法
 
-基于DES加密的TCP聊天程序
+基于RSA和DES加密的TCP聊天程序 
+
+补充：
+
+- 1. 通信前服务端发送RSA公钥给客户端，客户端接收后，使用该RSA公钥加密DES密钥，发送给服务端；
+- 2. 服务端接收加密后的DES密钥，使用手上的RSA私钥进行解密，此后双方内容经过DES加密，双方正式开始通信。
 
 ## 所需参数
 
@@ -50,13 +55,19 @@
 
 ```c++
 |-tcp-des-chat
-    |-des-src					//DES算法实现
-  	|-Const.h    //一些DES用到的常量，如置换表
-    	|-Des.h      //封装的DES类，供外部调用加密和解密操作
-    	|-Des.cpp    //DES类成员的实现
-    	|-main.cpp   //DES加解密功能测试
-    	|-Makefile   //使用make编译Des模块，执行main
- 	|-config.h//客户端和服务端共用的函数和常量
+    |-des-src     //DES算法实现
+        |-const.h    //一些DES用到的常量，如置换表
+        |-des.h      //封装的DES类，供外部调用加密和解密操作
+        |-des.cpp    //DES类成员的实现
+        |-main.cpp   //DES加解密功能测试
+        |-Makefile   //使用make编译Des模块，执行main
+		|-rsa-src	  		//RSA算法实现
+        |-tools.h    //一些RSA的辅助函数实现
+        |-rsa.h      //封装的RSA类
+        |-rsa.cpp    
+        |-main.cpp   // RSA 功能测试
+        |-Makefile   //单独编译RSA模块，执行main
+    |-config.h//客户端和服务端共用的函数和常量
     |-tcp-client.cpp//客户端实现
     |-tcp-server.cpp//服务端实现
     |-Makefile	//make编译链接生成client和server可执行程序

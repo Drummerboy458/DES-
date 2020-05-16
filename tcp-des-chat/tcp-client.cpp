@@ -7,22 +7,15 @@
 
 #include "config.h"
 static int sockfd;
-void begin_to_chat() //从服务端接收数据
+static Des des;
+static string key = "12345678"; // 客户端的64为密钥
+void chat_with_server()
 {
-    cout<<">>";
-    string reply;
-    getline(cin,reply);
-    //发送
-    if(!send_data(sockfd, reply))
-    {
-        cout<<"error in chat at send_data()"<<endl;
-        exit(1);
-    }
     while(1)
    {
         char buffer[bufferSize];
         memset (buffer,0,sizeof(buffer));
-        size_t size;
+    
         //接收服务端发送来的内容
         if(read(sockfd,buffer,sizeof(buffer))<0)
         {
@@ -30,28 +23,56 @@ void begin_to_chat() //从服务端接收数据
         }
         string s = buffer;
         string decode_data = des.decode(s);
-        cout<<"server："<<decode_data<<endl;
+        cout<<"server："<<decode_data<<endl<<">>";
+       
         //客户端回应
-        string reply;
-        cout<<">>";
-        getline(cin,reply);
+
+        string reply = "";
+        cin>>reply;
+        string encode_reply = des.encode(reply);
+
         //发送
-        if(!send_data(sockfd, reply))
+        if(!send_data(sockfd, encode_reply))
         {
             cout<<"error in chat at send_data()"<<endl;
             exit(1);
         }
-        else
-        {
-            string s = reply;
-            if(s == "-exit")    //客户端发起exit命令,结束本次通信
-                exit(0);
-        }
+        if(reply == "-exit")    //客户端发起exit命令,结束本次通信
+            exit(0);
    }
+}
+void online()
+{
+    des.setKey(key);
+    // 第一步，接收服务端发送的公钥
+    Public_key p_key;
+    //接收服务端发送来的内容
+    if(read(sockfd,&p_key,sizeof(Public_key))<0)
+    {
+        perror("read error");
+    }
+    cout<<"接收到来自服务端的RSA公钥<n："<<p_key.n<<",e："<<p_key.e<<">"<<endl;
+
+    // 第二步，将使用 RSA 加密后的DES密钥发送给服务端
+    unsigned int* encrpt_des_key = new unsigned int[key.length()];
+    const char* des_key = key.c_str();
+    for(int i = 0; i < key.length(); i++)
+    {
+        char a = des_key[i];
+        int b = atoi(&a);
+        encrpt_des_key[i] = Rsa::Encry(b,p_key);
+    }
+    // 发送加密des密钥
+    if(!send_des_key(sockfd,encrpt_des_key ))
+    {
+        cout<<"error in chat at send_des_key()"<<endl;
+        exit(1);
+    }
+
+    chat_with_server();
 }
 int main(int argc,const char* argv[])
 {
-    des.setKey(key);
     if(argc<3)
     {
         cout<<"usage:"<<argv[0]<<"  #ip #port"<<endl;
@@ -80,7 +101,7 @@ int main(int argc,const char* argv[])
     }
     else
     {    //（三）调用IO函数(read/write)和服务器端双向通信
-      cout<<"与服务器连接成功!\n 输入[-help]查看相应请求命令"<<endl;
+      cout<<"与服务器连接成功!\n输入[-help]查看相应请求命令"<<endl;
         while(1)
         {
             char cmd[6];
@@ -101,7 +122,7 @@ int main(int argc,const char* argv[])
                 if(send_data(sockfd, cmd))    //向服务端请求通信
                 {
                         cout<<"begin to chat with the server!"<<endl;
-                        begin_to_chat(); //开始进入聊天
+                        online(); //开始进入聊天
                 }
                 else
                     cout<<"聊天请求失败！"<<endl;

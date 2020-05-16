@@ -6,8 +6,8 @@ CC = g++
 LD = g++
 CFLAGS   += -O2 -Wall -Werror
 
-OBJS_S = des.o tcp-server.o
-OBJS_C = des.o tcp-client.o
+OBJS_S = des.o rsa.o tcp-server.o
+OBJS_C = des.o rsa.o tcp-client.o
 
 tcp-client.o : 
 	@$(CC) -c tcp-client.cpp
@@ -15,6 +15,8 @@ tcp-server.o :
 	@$(CC) -c tcp-server.cpp
 des.o : 
 	@$(CC) -c des-src/des.cpp
+rsa.o :
+	@$(CC) -c rsa-src/rsa.cpp
 
 all: server client
 

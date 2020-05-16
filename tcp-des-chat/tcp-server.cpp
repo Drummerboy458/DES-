@@ -5,10 +5,12 @@
 //  Copyright © 2019 Lww. All rights reserved.
 //
 #include "config.h"
+static Des des;
 static int sockfd; //全局文件描述符，绑定用于监听的socket
 //网络字节顺序NBO: 按从高到低的顺序存储，在网络上使用统一的网络字节顺序，避免兼容性问题。
 //主机字节顺序HBO: 不同的机器HBO不相同
 //输出连接上来的客户端相关信息
+
 void out_addr(struct sockaddr_in *clientaddr)
 {
     //将端口从网络字节序转成主机字节序
@@ -18,10 +20,23 @@ void out_addr(struct sockaddr_in *clientaddr)
     inet_ntop(AF_INET, &clientaddr->sin_addr.s_addr, ip, sizeof(ip));//将“整数” －> “点分十进制”]
     cout<<"client:"<<ip<<" "<<port<<" connected"<<endl;
 }
-void do_service(int fd)
+void chat_with_client(int fd)
 {
     while(1)
-   {
+    {
+        //服务端回应
+        cout<<">>";
+        string reply;
+        getline(cin,reply);
+        string encode_reply = des.encode(reply);
+        
+        if(!send_data(fd, encode_reply))
+        {
+            cout<<"error in chat at send_data()"<<endl;
+            exit(1);
+        }
+
+        // 客户端回应
         char buffer[bufferSize];
         memset (buffer,0,sizeof(buffer));
         //接收客户端发送来的内容
@@ -31,29 +46,65 @@ void do_service(int fd)
         }
         string s = buffer;
         string decode_data = des.decode(s);
-        //cout<<decode_data.size()<<endl;注意返回来的解密数据长度是8的倍数
         if(decode_data[0] == '-' && decode_data[1] == 'e')    //客户端发起exit命令,结束本次通信
-                break;
-        if(decode_data[0] == '-' && decode_data[1] == 'c')
-            cout<<"接电话！主人快接电话！"<<endl<<">>";
+                exit(0);
         else
-            cout<<"client："<<decode_data<<endl<<">>";
+            cout<<"client："<<decode_data<<endl;
+    }
+}
+void do_service(int fd)
+{
+
+          // 第一步，生成 RSA 公钥私钥对
+        Rsa rsa;
+        rsa.RsaGetParam();
+        Public_key p_key = rsa.get_public_key();
+        Secret_key s_key = rsa.get_secret_key();
+
+        cout<<"公钥<n："<<p_key.n<<",e："<<p_key.e<<">"<<endl;
+        cout<<"私钥<n："<<s_key.n<<",d："<<s_key.d<<">"<<endl;
+
+        char buffer[bufferSize];
+        memset (buffer,0,sizeof(buffer));
+        //接收客户端发送来的内容
+        if(read(fd,buffer,sizeof(buffer))<0)
+            perror("read error");
+
+        string s = buffer;
+
+        if(s[0] == '-' && s[1] == 'e')    //客户端发起exit命令,结束本次通信
+                exit(0);
         
-        //服务端回应
-        char reply[bufferSize];
-        memset(reply, 0, sizeof(reply));
-        cin.getline(reply,sizeof(reply));
-        //发送
-        if(!send_data(fd, reply))
+       
+       // 第二步，发送公钥对给客户端
+        if(!send_public_key(fd, p_key))
         {
-            cout<<"error in chat at send_data()"<<endl;
+            cout<<"error in chat at send_public_key()"<<endl;
             exit(1);
         }
-   }
+
+        cout<<"RSA密钥发送成功..."<<endl;
+        // 第三步，接收客户端使用RSA公钥加密后的 DES 密钥
+         unsigned int* encrpt_des_key = new unsigned int[8];
+        //接收服务端发送来的内容
+        if(read(fd,encrpt_des_key,sizeof(unsigned int)*8)<0)
+            perror("read error");
+        
+        unsigned int* des_key = new unsigned int[8];
+        string key = "";
+        for(int i = 0; i < 8; i++)
+        {
+            key += to_string(Rsa::Decry(encrpt_des_key[i],s_key));
+        }
+        des.setKey(key);
+
+        cout<<"DES密钥成功接收,可以通信了..."<<endl;
+        // 正式与客户端进行通信
+        chat_with_client(fd);
+      
 }
 int main(int argc, const char * argv[]) 
 {
-    des.setKey(key);
     if(argc < 2)
     {
         cout<<"usage:"<<argv[0]<<" "<<"#port"<<endl;
