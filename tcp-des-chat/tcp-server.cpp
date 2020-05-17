@@ -55,15 +55,6 @@ void chat_with_client(int fd)
 void do_service(int fd)
 {
 
-          // 第一步，生成 RSA 公钥私钥对
-        Rsa rsa;
-        rsa.RsaGetParam();
-        Public_key p_key = rsa.get_public_key();
-        Secret_key s_key = rsa.get_secret_key();
-
-        cout<<"公钥<n："<<p_key.n<<",e："<<p_key.e<<">"<<endl;
-        cout<<"私钥<n："<<s_key.n<<",d："<<s_key.d<<">"<<endl;
-
         char buffer[bufferSize];
         memset (buffer,0,sizeof(buffer));
         //接收客户端发送来的内容
@@ -75,6 +66,14 @@ void do_service(int fd)
         if(s[0] == '-' && s[1] == 'e')    //客户端发起exit命令,结束本次通信
                 exit(0);
         
+        // 第一步，生成 RSA 公钥私钥对
+        Rsa rsa;
+        rsa.RsaGetParam();
+        Public_key p_key = rsa.get_public_key();
+        Secret_key s_key = rsa.get_secret_key();
+
+        cout<<"公钥<n："<<p_key.n<<",e："<<p_key.e<<">"<<endl;
+        cout<<"私钥<n："<<s_key.n<<",d："<<s_key.d<<">"<<endl;
        
        // 第二步，发送公钥对给客户端
         if(!send_public_key(fd, p_key))

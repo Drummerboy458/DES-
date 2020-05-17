@@ -1,11 +1,8 @@
 #include "rsa.h"
 #include "tools.h"
 #include "math.h"
-
 #include <time.h> 
 #include <iostream>
-#include "stdlib.h"
-
 using namespace std;
 
 unsigned int Rsa::RandomPrime(int bits)

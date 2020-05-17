@@ -3,7 +3,6 @@
  */
 #ifndef RSA_H
 #define RSA_H
-
 // 密钥结构体
 struct Public_key
 {
@@ -41,6 +40,5 @@ public:
     static unsigned int Decry(unsigned int nSorce, Secret_key cKey);
     void RsaGetParam();   // 创建 Rsa 对象时调用，初始化参数
 };
-
 
 #endif
